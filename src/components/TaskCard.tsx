@@ -4,9 +4,9 @@ import { Task } from '@/types/task';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Calendar, Clock, Edit, Trash2, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface TaskCardProps {
   task: Task;
@@ -16,6 +16,7 @@ interface TaskCardProps {
 }
 
 export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardProps) => {
+  const { t } = useLanguage();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const getPriorityColor = (priority: Task['priority']) => {
@@ -37,23 +38,23 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
   const isOverdue = task.status !== 'completed' && task.dueDate < new Date();
 
   return (
-    <Card className={`transition-all duration-300 hover:shadow-lg ${isOverdue ? 'border-red-200 bg-red-50' : ''}`}>
+    <Card className={`transition-all duration-300 hover:shadow-lg dark:bg-slate-800 dark:border-slate-700 ${isOverdue ? 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20' : ''}`}>
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
-          <CardTitle className="text-lg font-semibold">{task.title}</CardTitle>
+          <CardTitle className="text-lg font-semibold dark:text-white">{task.title}</CardTitle>
           <div className="flex gap-2">
             <Badge className={getPriorityColor(task.priority)}>
-              {task.priority}
+              {t(`filter.${task.priority}`)}
             </Badge>
             <Badge className={getStatusColor(task.status)}>
-              {task.status}
+              {task.status === 'in-progress' ? t('stats.inProgress') : t(`stats.${task.status}`)}
             </Badge>
           </div>
         </div>
       </CardHeader>
       
       <CardContent className="space-y-4">
-        <p className="text-gray-600 text-sm">
+        <p className="text-gray-600 dark:text-gray-300 text-sm">
           {isExpanded ? task.description : `${task.description.substring(0, 100)}...`}
           {task.description.length > 100 && (
             <button 
@@ -65,7 +66,7 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
           )}
         </p>
 
-        <div className="flex items-center gap-4 text-sm text-gray-500">
+        <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
           <div className="flex items-center gap-1">
             <Calendar className="w-4 h-4" />
             <span className={isOverdue ? 'text-red-500 font-medium' : ''}>
@@ -88,7 +89,7 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
           </div>
         )}
 
-        <div className="flex justify-between items-center pt-3 border-t">
+        <div className="flex justify-between items-center pt-3 border-t dark:border-slate-600">
           <div className="flex gap-2">
             <Button
               size="sm"
@@ -96,7 +97,7 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
               onClick={() => onEdit(task)}
             >
               <Edit className="w-4 h-4 mr-1" />
-              Edit
+              {t('button.edit')}
             </Button>
             <Button
               size="sm"
@@ -104,7 +105,7 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
               onClick={() => onDelete(task.id)}
             >
               <Trash2 className="w-4 h-4 mr-1" />
-              Delete
+              {t('button.delete')}
             </Button>
           </div>
 
@@ -117,7 +118,7 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
               className="bg-green-500 hover:bg-green-600"
             >
               <CheckCircle className="w-4 h-4 mr-1" />
-              {task.status === 'todo' ? 'Start' : 'Complete'}
+              {task.status === 'todo' ? t('button.start') : t('button.complete')}
             </Button>
           )}
         </div>
